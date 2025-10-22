@@ -196,13 +196,14 @@ if query_pressed:
                 # Altair 바 차트 (크기 작게)
                 bar = (
                     alt.Chart(score_df)
-                    .mark_bar(cornerRadius=6)
+                    .mark_bar(size = 35, cornerRadius=6)
                     .encode(
                         x=alt.X('항목:N', sort=None, title=None),
                         y=alt.Y('점수:Q', scale=alt.Scale(domain=[0, 100])),
+                        color=alt.Color('색상:N', scale=None),
                         tooltip=['항목', alt.Tooltip('점수', format=".1f")]
                     )
-                    .properties(width=520, height=320)
+                    .properties(width=620, height=320)
                     .configure_mark(opacity=0.9)
                 )
 
