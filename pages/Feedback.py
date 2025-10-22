@@ -39,7 +39,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-st.markdown('<p class="title">🎓 학생 피드백 조회 시스템</p>', unsafe_allow_html=True)
+st.title('<p class="title">🎓 학생 피드백 조회 시스템</p>', unsafe_allow_html=True)
 st.markdown('<p class="sub">학번(D열)과 이름(E열)을 입력하면 해당 학생의 과제 요약·점수·피드백을 보여줍니다.</p>', unsafe_allow_html=True)
 
 # 입력
