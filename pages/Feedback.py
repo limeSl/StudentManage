@@ -202,7 +202,7 @@ if query_pressed:
                         y=alt.Y('점수:Q', scale=alt.Scale(domain=[0, 100])),
                         tooltip=['항목', alt.Tooltip('점수', format=".1f")]
                     )
-                    .properties(width=320, height=220)
+                    .properties(width=520, height=320)
                     .configure_mark(opacity=0.9)
                 )
 
