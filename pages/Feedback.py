@@ -171,46 +171,23 @@ else:
         st.markdown(f"<div class='feedback-box'>{summary}</div>", unsafe_allow_html=True)
 
         # 2) 점수 시각화
-        st.markdown("### 📊 점수 비교")
-        # 모든 점수 안전하게 float 변환 (nan 제거)
-        def parse_score(x):
-            try:
-                return float(re.sub(r'[^\d\.]', '', str(x)))
-            except:
-                return np.nan
+            st.markdown(f"<div style='{SUBTITLE_STYLE}'>📊 점수 비교</div>", unsafe_allow_html=True)
+            score_data = pd.DataFrame({
+                "평가 항목": ["내 점수", "평균 점수", "중간 점수"],
+                "점수": [score, avg_score, median_score]
+            })
 
-        all_scores = df[score_col].apply(parse_score).dropna().astype(float)
-        if all_scores.empty or np.isnan(student_score):
-            st.warning("점수 데이터가 불완전하여 비교/시각화를 할 수 없습니다.")
-            st.markdown(f"<div class='score-box'>내 점수: {row[score_col]}</div>", unsafe_allow_html=True)
-        else:
-            avg_score = all_scores.mean()
-            median_score = np.median(all_scores)
-            # Gauge 차트
-            fig = go.Figure()
-            fig.add_trace(go.Indicator(
-                mode="gauge+number",
-                value=student_score,
-                title={'text': "내 점수"},
-                gauge={
-                    'axis': {'range': [0, 100]},
-                    'bar': {'color': "#2E86C1"},
-                    'steps': [
-                        {'range': [0, median_score], 'color': "#F2F4F4"},
-                        {'range': [median_score, avg_score], 'color': "#AED6F1"},
-                        {'range': [avg_score, 100], 'color': "#D6EAF8"},
-                    ]
-                }
-            ))
-            st.plotly_chart(fig, use_container_width=True)
-            st.markdown(f"""
-            <div class='score-box'>
-            📈 <b>평균 점수:</b> {avg_score:.1f}점 &nbsp;&nbsp;
-            📊 <b>중간 점수:</b> {median_score:.1f}점 &nbsp;&nbsp;
-            🧍 <b>내 점수:</b> {student_score:.1f}점
-            </div>
-            """, unsafe_allow_html=True)
-
+            bar_chart = (
+                alt.Chart(score_data)
+                .mark_bar()
+                .encode(
+                    x=alt.X("평가 항목", sort=None),
+                    y="점수",
+                    tooltip=["평가 항목", "점수"]
+                )
+                .properties(width=300, height=280)  # ✅ 크기 줄임
+            )
+            st.altair_chart(bar_chart, use_container_width=True)
         # 3) 피드백
         st.markdown("### 💬 피드백")
         st.markdown(f"<div class='feedback-box'>{feedback}</div>", unsafe_allow_html=True)
