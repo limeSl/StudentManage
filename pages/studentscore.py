@@ -83,3 +83,10 @@ try:
                     if len(duplicates) > 1:
                         st.write("동명이인 목록:")
                         st.dataframe(duplicates[['번호', '이름']])
+                    else:
+                        st.warning("동명이인이 없습니다.")
+            else:
+                st.info("🔍 동명이인이 여러 명 있습니다. 아래 목록을 확인하세요.")
+                st.dataframe(matches[['번호', '이름']])
+except Exception as e:
+    st.error(f"❌ 데이터를 불러오는 중 오류가 발생했습니다: {e}")
