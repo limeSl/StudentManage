@@ -19,7 +19,7 @@ def load_sheet(url):
 
 if SHEET_URL:
     try:
-        df = load_sheet(https://docs.google.com/spreadsheets/d/1Nap48AW6zmfwVqeTyVJ8oGcegt2j8VgD5ovBxxNKMgM/edit?usp=sharing)
+        df = load_sheet(SHEET_URL)
         if df is None:
             st.error("⚠️ 올바른 구글 시트 링크를 입력해주세요.")
         else:
@@ -91,4 +91,3 @@ if SHEET_URL:
                     st.dataframe(matches[['번호', '이름']])
     except Exception as e:
         st.error(f"❌ 데이터를 불러오는 중 오류가 발생했습니다: {e}")
-
