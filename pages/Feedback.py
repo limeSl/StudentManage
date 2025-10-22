@@ -10,21 +10,30 @@ st.markdown("""
     <style>
         .title {
             text-align: center;
-            font-size: 32px;
-            color: #2E86C1;
-            font-weight: bold;
+            font-size: 48px;      /* 제목 크기 키움 */
+            color: #1A5276;
+            font-weight: 800;
+            margin-bottom: -10px;
         }
         .sub {
             text-align: center;
             color: #5D6D7E;
-            margin-bottom: 30px;
+            font-size: 18px;
+            margin-bottom: 40px;
         }
         .feedback-box {
             background-color: #F4F6F7;
             padding: 20px;
             border-radius: 10px;
-            border-left: 5px solid #3498DB;
+            border-left: 6px solid #3498DB;
             margin-top: 20px;
+        }
+        .score-box {
+            background-color: #EBF5FB;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 18px;
+            margin-top: 10px;
         }
     </style>
 """, unsafe_allow_html=True)
@@ -66,15 +75,24 @@ except Exception as e:
 # 4️⃣ 학생 검색 및 피드백 표시
 # ----------------------------
 if student_name and student_id:
-    match = df[(df['학번'].astype(str) == student_id) & (df['이름'] == student_name)]
+    # D열(학번), E열(이름) 기준 탐색
+    id_col = df.columns[3]   # D열
+    name_col = df.columns[4] # E열
+
+    match = df[(df[id_col].astype(str) == student_id) & (df[name_col] == student_name)]
 
     if not match.empty:
         st.success(f"✅ {student_name} 학생의 데이터를 찾았습니다.")
         row = match.iloc[0]
 
-        summary = row['A'] if 'A' in df.columns else row[df.columns[0]]
-        score = row['B'] if 'B' in df.columns else row[df.columns[1]]
-        feedback = row['C'] if 'C' in df.columns else row[df.columns[2]]
+        # A, B, C열 추출
+        summary_col = df.columns[0]  # A열
+        score_col = df.columns[1]    # B열
+        feedback_col = df.columns[2] # C열
+
+        summary = row[summary_col]
+        score = float(row[score_col])
+        feedback = row[feedback_col]
 
         # ----------------------------
         # 5️⃣ 과제 내용 요약 표시
@@ -87,10 +105,10 @@ if student_name and student_id:
         # ----------------------------
         st.markdown("### 📊 점수 비교")
 
-        scores = df[df.columns[1]].dropna().astype(float)
+        scores = df[score_col].dropna().astype(float)
         avg_score = np.mean(scores)
         median_score = np.median(scores)
-        student_score = float(score)
+        student_score = score
 
         fig = go.Figure()
 
@@ -98,22 +116,26 @@ if student_name and student_id:
             mode="gauge+number",
             value=student_score,
             title={'text': "내 점수"},
-            gauge={'axis': {'range': [0, 100]},
-                   'bar': {'color': "#2E86C1"},
-                   'steps': [
-                       {'range': [0, median_score], 'color': "#E5E8E8"},
-                       {'range': [median_score, avg_score], 'color': "#AED6F1"},
-                       {'range': [avg_score, 100], 'color': "#D6EAF8"},
-                   ]}
+            gauge={
+                'axis': {'range': [0, 100]},
+                'bar': {'color': "#2E86C1"},
+                'steps': [
+                    {'range': [0, median_score], 'color': "#E5E8E8"},
+                    {'range': [median_score, avg_score], 'color': "#AED6F1"},
+                    {'range': [avg_score, 100], 'color': "#D6EAF8"},
+                ],
+            }
         ))
 
         st.plotly_chart(fig, use_container_width=True)
 
         st.markdown(f"""
-        - 📈 **평균 점수:** {avg_score:.1f}점  
-        - 📊 **중간 점수:** {median_score:.1f}점  
-        - 🧍 **내 점수:** {student_score:.1f}점
-        """)
+        <div class='score-box'>
+        📈 <b>평균 점수:</b> {avg_score:.1f}점  
+        📊 <b>중간 점수:</b> {median_score:.1f}점  
+        🧍 <b>내 점수:</b> {student_score:.1f}점
+        </div>
+        """, unsafe_allow_html=True)
 
         # ----------------------------
         # 7️⃣ 피드백 표시
