@@ -81,12 +81,13 @@ else:
             align-items: center;
             justify-content: flex-start;
             gap: 80px;
+            margin-bottom: 10px;
             flex-wrap: wrap;
         }
 
         .profile-img {
-            width: 240px
-            height: 240px
+            width: 240px;
+            height: 240px;
             object-fit: cover;
             border-radius: 10px;
             object-position: center;
@@ -135,7 +136,7 @@ else:
     profile_html = f"""
     <div class="profile-wrapper">
         {f'<img src="{st.session_state.profile_image}" class="profile-img">' if st.session_state.profile_image
-          else '<div style="width:260px;height:260px;border-radius:50%;background:#ddd;display:flex;align-items:center;justify-content:center;font-size:90px;color:#999;">🙂</div>'}
+          else '<div style="width:240px;height:240px;border-radius:10px;background:#ddd;display:flex;align-items:center;justify-content:center;font-size:90px;color:#999;">🙂</div>'}
         <div class="profile-info">
             <div class="profile-id">{st.session_state.student_id}</div>
             <div class="profile-name">{st.session_state.student_name}</div>
