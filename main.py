@@ -86,8 +86,8 @@ else:
         }
 
          .profile-img {
-            width: 280px;
-            height: 280px;
+            width: 220px;
+            height: 220px;
             border-radius: 12px;          
             background-size: cover;       
             background-position: center;  
