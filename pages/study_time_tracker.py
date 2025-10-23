@@ -5,6 +5,11 @@ import datetime
 import time
 import matplotlib.pyplot as plt
 
+EXPECTED_COLUMNS = ["date", "goal_hours", "goal_minutes", "real_hours", "real_minutes"]
+
+if "study_data" not in st.session_state or not all(col in st.session_state["study_data"].columns for col in EXPECTED_COLUMNS):
+    st.session_state["study_data"] = pd.DataFrame(columns=EXPECTED_COLUMNS)
+    
 st.set_page_config(page_title="공부시간 추적 + 뽀모도로", layout="centered")
 st.title("📚 공부시간 트래커 + 🍅 뽀모도로 타이머")
 
