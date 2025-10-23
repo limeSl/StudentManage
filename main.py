@@ -120,13 +120,6 @@ else:
             font-size: 2.2rem;
             font-weight: 600;
         }
-
-        /* 🌗 라이트/다크모드 자동 색상 조절 */
-        @media (prefers-color-scheme: dark) {
-            .profile-name, .profile-id {
-                color: #f3f3f3;
-            }
-        }
         </style>
     """, unsafe_allow_html=True)
 
