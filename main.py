@@ -87,13 +87,10 @@ else:
         }
 
         .profile-img {
-            width: 300px;
-            height: 300px;
+            width: 240px;
+            height: 240px;
             border-radius: 10px;
             object-fit: cover;
-            object-position: center;
-            border: 3px solid #fff;
-            box-shadow: 0 0 15px rgba(0,0,0,0.25);
         }
 
         .profile-info {
