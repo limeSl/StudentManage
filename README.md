@@ -13,7 +13,6 @@ if "logged_in" not in st.session_state or not st.session_state.logged_in:
     st.warning("⚠️ 로그인 후 이용할 수 있습니다. 메인 페이지로 이동해주세요.")
     st.stop()
 
-# 로그인 정보 가져오기
 student_id = str(st.session_state.get("student_id", "")).strip()
 student_name = str(st.session_state.get("student_name", "")).strip()
 
