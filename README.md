@@ -1,3 +1,5 @@
+schoollife.streamlit.app
+
 로그인 페이지를 추가했습니다. (main.py 그대로 이용하면 됨)
 
 https://docs.google.com/spreadsheets/d/1Pa6sSB1dFiCge6MwnpgEG1AQnCHnVkVhdb1EGkUPuTU/edit?gid=0#gid=0
