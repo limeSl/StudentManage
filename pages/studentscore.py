@@ -19,13 +19,13 @@ def load_data(url):
     return df
 
 df = load_data(sheet_csv_url)
-st.title("📈 학생 성적 추이 (Plotly)")
+st.title("📈 학생 성적 추이 ")
 
 if df is None:
     st.stop()
 
 # 데이터 구조 안내
-st.caption("시트 구조: 1행 = 레이블(헤더), 2행부터 데이터. A=번호, B=이름, C~F=시험점수 (자동으로 C열부터 F열 사용)")
+#st.caption("시트 구조: 1행 = 레이블(헤더), 2행부터 데이터. A=번호, B=이름, C~F=시험점수 (자동으로 C열부터 F열 사용)")
 
 # 최소 컬럼 수 체크
 if df.shape[1] < 4:
