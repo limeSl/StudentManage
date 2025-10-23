@@ -134,28 +134,19 @@ else:
     """, unsafe_allow_html=True)
 
     # --- 프로필 표시 영역 ---
-    st.markdown('<div class="profile-wrapper">', unsafe_allow_html=True)
-
-    # 프로필 이미지 (완전 원형, 여백 없이 꽉 차게)
-    img_html = (
-        f'<img src="{st.session_state.profile_image}" class="profile-img">'
-        if st.session_state.profile_image
-        else '<div style="width:260px;height:260px;border-radius:50%;background:#ddd;display:flex;align-items:center;justify-content:center;font-size:90px;color:#999;">🙂</div>'
-    )
-    st.markdown(img_html, unsafe_allow_html=True)
-
-    # 이름 + 학번 (옆에 선명히 표시)
-    st.markdown(
-        f"""
+    # 이미지 + 텍스트를 한 블록에 통합
+    profile_html = f"""
+    <div class="profile-wrapper">
+        {f'<img src="{st.session_state.profile_image}" class="profile-img">' if st.session_state.profile_image
+          else '<div style="width:260px;height:260px;border-radius:50%;background:#ddd;display:flex;align-items:center;justify-content:center;font-size:90px;color:#999;">🙂</div>'}
         <div class="profile-info">
             <div class="profile-name">{st.session_state.student_name}</div>
             <div class="profile-id">{st.session_state.student_id}</div>
         </div>
-        """,
-        unsafe_allow_html=True,
-    )
+    </div>
+    """
+    st.markdown(profile_html, unsafe_allow_html=True)
 
-    st.markdown('</div>', unsafe_allow_html=True)
 
     # --- 프로필 수정 섹션 ---
     st.subheader("프로필 이미지 변경")
