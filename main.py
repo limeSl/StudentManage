@@ -87,13 +87,13 @@ else:
         }
 
         .profile-img {
-            width: 260px;
-            height: 260px;
-            border-radius: 50%;
+            width: 300px;
+            height: 300px;
+            border-radius: 10px;
             object-fit: cover;
             object-position: center;
             border: 3px solid #fff;
-            box-shadow: 0 0 20px rgba(0,0,0,0.3);
+            box-shadow: 0 0 15px rgba(0,0,0,0.25);
         }
 
         .profile-info {
@@ -107,11 +107,11 @@ else:
         .profile-name {
             font-size: 2.2rem;
             font-weight: 800;
-            margin-bottom: 18px;
             letter-spacing: 1px;
         }
 
         .profile-id {
+            margin-bottom: 5px;
             font-size: 1.5rem;
             font-weight: 600;
         }
@@ -140,8 +140,8 @@ else:
         {f'<img src="{st.session_state.profile_image}" class="profile-img">' if st.session_state.profile_image
           else '<div style="width:260px;height:260px;border-radius:50%;background:#ddd;display:flex;align-items:center;justify-content:center;font-size:90px;color:#999;">🙂</div>'}
         <div class="profile-info">
-            <div class="profile-name">{st.session_state.student_name}</div>
             <div class="profile-id">{st.session_state.student_id}</div>
+            <div class="profile-name">{st.session_state.student_name}</div>
         </div>
     </div>
     """
