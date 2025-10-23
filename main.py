@@ -81,20 +81,12 @@ else:
             align-items: center;
             justify-content: flex-start;
             gap: 80px;
-            margin-top: 30px;
-            margin-bottom: 30px;
             flex-wrap: wrap;
         }
 
-        img {
-    	    width: 100%;
-    	    height: 100%;
-    	    object-fit: cover;
-        }
-
         .profile-img {
-            width: 240px;
-            height: 240px;
+            width: 100%;
+            height: 100%;
             object-fit: cover;
             border-radius: 10px;
         }
