@@ -142,7 +142,7 @@ else:
     profile_html = f"""
     <div class="profile-wrapper">
     <div class="profile-img" style="{'background-image: url(' + st.session_state.profile_image + ');' if st.session_state.profile_image else ''}">
-        {'' if st.session_state.profile_image else '🙂'}
+        {'' if st.session_state.profile_image else ':)'}
     </div>
         <div class="profile-info">
             <div class="profile-id">{st.session_state.student_id}</div>
