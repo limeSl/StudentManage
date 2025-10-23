@@ -85,9 +85,9 @@ else:
         }
 
         .profile-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+            width: 240px
+            height: 240px
+            object-fit: fill;
             border-radius: 10px;
         }
 
