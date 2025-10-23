@@ -99,7 +99,6 @@ else:
         .profile-info {
             display: flex;
             flex-direction: column;
-            justify-content: center;
             text-align: left;
             line-height: 1.8;
         }
