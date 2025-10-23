@@ -127,14 +127,6 @@ else:
                 color: #f3f3f3;
             }
         }
-        @media (prefers-color-scheme: light) {
-            .profile-name {
-                color: #111;
-            }
-            .profile-id {
-                color: #333;
-            }
-        }
         </style>
     """, unsafe_allow_html=True)
 
