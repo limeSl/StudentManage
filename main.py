@@ -87,8 +87,10 @@ else:
         .profile-img {
             width: 240px
             height: 240px
-            object-fit: fill;
+            object-fit: cover;
             border-radius: 10px;
+            object-position: center;
+            overflow: hidden;
         }
 
         .profile-info {
