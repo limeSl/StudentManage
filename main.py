@@ -22,12 +22,14 @@ def call_api(action: str, payload: dict):
     except ValueError:
         return {"ok": False, "error": f"JSON 파싱 실패: {res.text[:200]}"}
 
+
 def hide_sidebar_pages():
     st.markdown("""
     <style>
       section[data-testid="stSidebar"] ul[data-testid="stSidebarNav"] { display: none; }
     </style>
     """, unsafe_allow_html=True)
+
 
 def show_sidebar_pages():
     st.sidebar.markdown("### 페이지")
@@ -36,10 +38,12 @@ def show_sidebar_pages():
     except Exception:
         pass
 
+
 # ---------------- 세션 상태 ----------------
-for key in ["logged_in","student_id","student_name","profile_image"]:
+for key in ["logged_in", "student_id", "student_name", "profile_image"]:
     if key not in st.session_state:
         st.session_state[key] = "" if key != "logged_in" else False
+
 
 # ---------------- UI ----------------
 if not st.session_state.logged_in:
@@ -76,11 +80,12 @@ else:
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 60px;
-            margin-top: 40px;
-            margin-bottom: 40px;
+            gap: 80px;
+            margin-top: 60px;
+            margin-bottom: 60px;
             flex-wrap: wrap;
         }
+
         .profile-img {
             width: 260px;
             height: 260px;
@@ -90,24 +95,40 @@ else:
             border: 5px solid #fff;
             box-shadow: 0 0 20px rgba(0,0,0,0.3);
         }
+
         .profile-info {
             display: flex;
             flex-direction: column;
             justify-content: center;
             text-align: left;
+            line-height: 1.8;
         }
+
         .profile-name {
-            font-size: 2rem;
+            font-size: 2.2rem;
             font-weight: 800;
-            color: #111;
             margin-bottom: 18px;
             letter-spacing: 1px;
         }
+
         .profile-id {
-            font-size: 1.4rem;
+            font-size: 1.5rem;
             font-weight: 600;
-            color: #333;
-            margin-top: 5px;
+        }
+
+        /* 🌗 라이트/다크모드 자동 색상 조절 */
+        @media (prefers-color-scheme: dark) {
+            .profile-name, .profile-id {
+                color: #f3f3f3;
+            }
+        }
+        @media (prefers-color-scheme: light) {
+            .profile-name {
+                color: #111;
+            }
+            .profile-id {
+                color: #333;
+            }
         }
         </style>
     """, unsafe_allow_html=True)
@@ -115,15 +136,15 @@ else:
     # --- 프로필 표시 영역 ---
     st.markdown('<div class="profile-wrapper">', unsafe_allow_html=True)
 
-    # 프로필 이미지 (동그랗게 꽉 차게 표시)
+    # 프로필 이미지 (완전 원형, 여백 없이 꽉 차게)
     img_html = (
         f'<img src="{st.session_state.profile_image}" class="profile-img">'
         if st.session_state.profile_image
-        else '<div style="width:260px;height:260px;border-radius:50%;background:#eee;display:flex;align-items:center;justify-content:center;font-size:90px;color:#bbb;">🙂</div>'
+        else '<div style="width:260px;height:260px;border-radius:50%;background:#ddd;display:flex;align-items:center;justify-content:center;font-size:90px;color:#999;">🙂</div>'
     )
     st.markdown(img_html, unsafe_allow_html=True)
 
-    # 이름 + 학번
+    # 이름 + 학번 (옆에 선명히 표시)
     st.markdown(
         f"""
         <div class="profile-info">
@@ -133,6 +154,7 @@ else:
         """,
         unsafe_allow_html=True,
     )
+
     st.markdown('</div>', unsafe_allow_html=True)
 
     # --- 프로필 수정 섹션 ---
