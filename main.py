@@ -81,7 +81,7 @@ else:
             align-items: center;
             justify-content: flex-start;
             gap: 80px;
-            margin-bottom: 10px;
+            margin-bottom: 30px;
             flex-wrap: wrap;
         }
 
