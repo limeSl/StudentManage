@@ -22,22 +22,27 @@ def call_api(action: str, payload: dict):
     except ValueError:
         return {"ok": False, "error": f"JSON 파싱 실패: {res.text[:200]}"}
 
-
-def hide_sidebar_pages():
+def hide_sidebar_when_logged_out():
     st.markdown("""
     <style>
-      section[data-testid="stSidebar"] ul[data-testid="stSidebarNav"] { display: none; }
+      /* 사이드바 자체를 완전히 접고 보이지 않게 */
+      [data-testid="stSidebar"] {
+        width: 0 !important;
+        min-width: 0 !important;
+        max-width: 0 !important;
+        visibility: hidden !important;
+        overflow: hidden !important;
+      }
+      /* 사이드바 토글 버튼도 숨김 */
+      [data-testid="stSidebarCollapseButton"] {
+        display: none !important;
+      }
+      /* 사이드바 안의 모든 클릭/포커스 차단 */
+      [data-testid="stSidebar"] * {
+        pointer-events: none !important;
+      }
     </style>
     """, unsafe_allow_html=True)
-
-
-def show_sidebar_pages():
-    st.sidebar.markdown("### 페이지")
-    try:
-        st.sidebar.page_link("pages/Feedback.py", label="📝 피드백 페이지")
-    except Exception:
-        pass
-
 
 # ---------------- 세션 상태 ----------------
 for key in ["logged_in", "student_id", "student_name", "profile_image"]:
@@ -47,7 +52,7 @@ for key in ["logged_in", "student_id", "student_name", "profile_image"]:
 
 # ---------------- UI ----------------
 if not st.session_state.logged_in:
-    hide_sidebar_pages()
+    hide_sidebar_when_logged_out()
     st.markdown("""
         <div style="text-align:left; margin-bottom: 30px;">
             <h1 style="font-size: 3rem; color:#222;">🏫School Life📚</h1>
@@ -79,7 +84,6 @@ if not st.session_state.logged_in:
                 st.error(f"로그인 실패: {resp.get('error')}")
 else:
     # ---------- 프로필 페이지 ----------
-    show_sidebar_pages()
     st.title("🌷 내 프로필")
 
     # --- 스타일 커스터마이징 ---
