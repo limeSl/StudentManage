@@ -81,8 +81,8 @@ else:
             align-items: center;
             justify-content: flex-start;
             gap: 80px;
-            margin-top: 60px;
-            margin-bottom: 60px;
+            margin-top: 30px;
+            margin-bottom: 30px;
             flex-wrap: wrap;
         }
 
@@ -95,6 +95,7 @@ else:
         .profile-img {
             width: 240px;
             height: 240px;
+            object-fit: cover;
             border-radius: 10px;
         }
 
