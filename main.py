@@ -48,8 +48,14 @@ for key in ["logged_in", "student_id", "student_name", "profile_image"]:
 # ---------------- UI ----------------
 if not st.session_state.logged_in:
     hide_sidebar_pages()
-    st.title("🔐 학생 로그인")
+    st.markdown("""
+        <div style="text-align:center; margin-bottom: 30px;">
+            <h1 style="font-size: 3rem; margin-bottom: 10px; color:#222;">School Life</h1>
+            <h2 style="font-size: 1.6rem; color:#555;">환영합니다 😊</h2>
+        </div>
+    """, unsafe_allow_html=True)
 
+    st.markdown("<h3 style='text-align:center; color:#666;'>학생 로그인</h3>", unsafe_allow_html=True)
     student_id = st.text_input("학번")
     password = st.text_input("비밀번호", type="password")
 
