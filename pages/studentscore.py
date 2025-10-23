@@ -6,7 +6,7 @@ import re
 from urllib.parse import urlparse, parse_qs
 
 st.set_page_config(page_title="학생 성적 조회 (B열 2행~)", page_icon="🎓", layout="centered")
-st.title("🎓 학생 성적 조회 (B열 2행부터 검색)")
+st.title("🎓 학생 성적 조회")
 
 # --- 고정된 구글 시트 export CSV URL (공개링크 필요) ---
 SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/1Nap48AW6zmfwVqeTyVJ8oGcegt2j8VgD5ovBxxNKMgM/export?format=csv"
@@ -33,7 +33,8 @@ except Exception as e:
     st.exception(e)
     st.stop()
 
-st.info("구글 시트를 불러왔습니다. (헤더 무시, B열의 2행부터 검색합니다.)")
+# st.info("구글 시트를 불러왔습니다. (헤더 무시, B열의 2행부터 검색합니다.)")
+st.info("자신이 받은 성적의 변화를 보여줍니다.")
 st.caption(f"읽은 행 수: {len(df_raw)}  — (컬럼 인덱스: 0=A열, 1=B열(이름), 2=C열, ... )")
 
 # 최소 행 수 체크
