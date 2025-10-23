@@ -17,7 +17,7 @@ def load_data(force_reload=False):
         st.session_state["data"] = df
     return st.session_state["data"]
 
-st.title("📈 학생 성적 추이 (Plotly)")
+st.title("📈 학생 성적 추이")
 st.caption("A열=학번, B열=이름, C~F열=시험 점수")
 
 # 🔄 새로고침 버튼
