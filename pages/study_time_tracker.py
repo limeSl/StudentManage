@@ -1,111 +1,74 @@
-# pages/study_time_tracker.py
+# studytime_page.py
 import streamlit as st
 import gspread
 import pandas as pd
-from datetime import datetime, timedelta
+import re
+from google.oauth2.service_account import Credentials
 import matplotlib.pyplot as plt
 
-# --- 구글 시트 접근 설정 ---
-# 방법 1) Streamlit Cloud의 secrets.toml 에 저장된 경우:
-# st.secrets["study_db_url"]
-# 방법 2) 직접 코드에 URL을 입력할 수도 있습니다 ↓
-SPREADSHEET_URL = st.secrets.get("study_db_url", "https://docs.google.com/spreadsheets/d/스프레드시트_ID_여기에_삽입/edit#gid=0")
+# --- Google Sheets 연결 ---
+SCOPE = ["https://spreadsheets.google.com/feeds",
+         "https://www.googleapis.com/auth/drive"]
+creds = Credentials.from_service_account_file("service_account.json", scopes=SCOPE)
+gc = gspread.authorize(creds)
+sheet = gc.open_by_url("https://docs.google.com/spreadsheets/d/1Pa6sSB1dFiCge6MwnpgEG1AQnCHnVkVhdb1EGkUPuTU/edit?gid=1916264337").worksheet("Studytime")
 
-# 공개 접근용 gspread 클라이언트
-gc = gspread.public()
+data = sheet.get_all_records()
+df = pd.DataFrame(data)
 
-# 파일 열기
-spreadsheet = gc.open_by_url(SPREADSHEET_URL)
-students_sheet = spreadsheet.worksheet("students")
-all_sheet = spreadsheet.worksheet("study_time_all")
+st.title("📚 오늘의 공부시간 플래너")
 
-students_df = pd.DataFrame(students_sheet.get_all_records())
-all_df = pd.DataFrame(all_sheet.get_all_records())
+# --- 입력 영역 ---
+col1, col2 = st.columns(2)
+with col1:
+    st.subheader("🎯 오늘의 목표 공부시간")
+    goal_hours = st.number_input("시간", min_value=0, max_value=24, step=1, key="goal_h")
+    goal_minutes = st.number_input("분", min_value=0, max_value=59, step=5, key="goal_m")
 
-# --- 로그인된 사용자 확인 ---
-if "user_id" not in st.session_state:
-    st.warning("로그인 후 이용 가능합니다.")
-    st.stop()
+with col2:
+    st.subheader("⏰ 오늘 실제 공부시간")
+    actual_hours = st.number_input("시간 ", min_value=0, max_value=24, step=1, key="real_h")
+    actual_minutes = st.number_input("분 ", min_value=0, max_value=59, step=5, key="real_m")
 
-user_id = st.session_state["user_id"]
-user_name = st.session_state["user_name"]
+if st.button("결과 확인"):
+    goal_total_min = goal_hours * 60 + goal_minutes
+    actual_total_min = actual_hours * 60 + actual_minutes
 
-st.title(f"📘 공부시간 관리 ({user_name}님)")
+    diff = actual_total_min - goal_total_min
+    diff_hours = abs(diff) // 60
+    diff_minutes = abs(diff) % 60
 
-# --- 1. 날짜 및 목표시간 입력 ---
-today = datetime.today().date()
-selected_date = st.date_input("📅 날짜 선택", value=today)
-
-goal_hours = st.number_input("🎯 오늘의 목표 공부시간 (시간)", min_value=0.0, max_value=24.0, step=0.5)
-actual_hours = st.number_input("⏰ 오늘의 실제 공부시간 (시간)", min_value=0.0, max_value=24.0, step=0.5)
-
-if st.button("저장하기"):
-    new_row = {
-        "date": str(selected_date),
-        "id": user_id,
-        "name": user_name,
-        "goal_hours": goal_hours,
-        "actual_hours": actual_hours
-    }
-
-    # DataFrame 업데이트
-    all_df = pd.concat([all_df, pd.DataFrame([new_row])], ignore_index=True)
-    all_sheet.append_row(list(new_row.values()))
-
-    # 개인 시트 확인 후 없으면 생성
-    try:
-        student_sheet = spreadsheet.worksheet(user_id)
-    except gspread.exceptions.WorksheetNotFound:
-        student_sheet = spreadsheet.add_worksheet(title=user_id, rows="1000", cols="10")
-        student_sheet.append_row(list(new_row.keys()))
-    student_sheet.append_row(list(new_row.values()))
-
-    st.success("오늘의 공부시간이 저장되었습니다!")
-
-# --- 2. 목표 대비 실제 비교 ---
-if goal_hours > 0 and actual_hours > 0:
-    diff = actual_hours - goal_hours
-    h = int(abs(diff))
-    m = int(abs(diff * 60) % 60)
-    if diff >= 0:
-        st.info(f"✅ 오늘의 공부 시간은 목표보다 **{h}시간 {m}분 많아요!**")
+    if diff > 0:
+        st.success(f"💪 오늘 실제 공부 시간은 목표보다 {diff_hours}시간 {diff_minutes}분 많아요!")
+        st.write("대단해요! 꾸준한 노력이 성과로 이어지고 있어요 👏")
+    elif diff < 0:
+        st.warning(f"📉 오늘 실제 공부 시간은 목표보다 {diff_hours}시간 {diff_minutes}분 적어요.")
+        st.write("괜찮아요 😊 내일은 조금 더 집중해봐요. 꾸준함이 가장 중요하답니다 💪")
     else:
-        st.warning(f"⚠️ 오늘의 공부 시간은 목표보다 **{h}시간 {m}분 적어요.**")
+        st.info("⏱️ 오늘은 목표 공부시간을 정확히 달성했어요! 완벽해요 🌟")
 
-    # --- 막대그래프 ---
+    # --- 구글 시트 평균 공부시간 계산 ---
+    def parse_time(t):
+        match = re.match(r"(\d+)시간\s*(\d+)분", t)
+        if match:
+            h, m = map(int, match.groups())
+            return h * 60 + m
+        return 0
+
+    df["총분"] = df["공부시간"].apply(parse_time)
+    avg_min = df["총분"].mean()
+    avg_hours = int(avg_min // 60)
+    avg_minutes = int(avg_min % 60)
+
+    st.subheader("📊 공부시간 비교")
+    st.write(f"전체 평균 공부시간: **{avg_hours}시간 {avg_minutes}분**")
+
+    # --- 그래프 시각화 ---
+    labels = ["내 공부시간", "전체 평균"]
+    values = [actual_total_min / 60, avg_min / 60]
+
     fig, ax = plt.subplots()
-    ax.bar(["목표시간", "실제시간"], [goal_hours, actual_hours])
-    ax.set_ylabel("시간")
-    ax.set_title(f"{selected_date} 공부시간 비교")
+    ax.bar(labels, values)
+    ax.set_ylabel("공부시간 (시간)")
+    ax.set_title("오늘의 공부시간 비교")
     st.pyplot(fig)
-
-# --- 3. 이번 주 공부시간 그래프 ---
-st.subheader("📆 이번 주 공부시간 추이")
-
-today = datetime.today()
-start_of_week = today - timedelta(days=today.weekday())
-end_of_week = start_of_week + timedelta(days=6)
-
-mask = (pd.to_datetime(all_df["date"]) >= start_of_week) & (pd.to_datetime(all_df["date"]) <= end_of_week)
-week_df = all_df[mask]
-
-if not week_df.empty:
-    user_week_df = week_df[week_df["id"] == user_id]
-    user_week_df = user_week_df.groupby("date", as_index=False)["actual_hours"].mean()
-
-    # 반 평균 계산
-    user_class = students_df[students_df["id"] == user_id]["class"].values[0]
-    class_df = week_df.merge(students_df, on="id")
-    class_week_df = class_df[class_df["class"] == user_class]
-    class_avg_df = class_week_df.groupby("date", as_index=False)["actual_hours"].mean()
-
-    fig2, ax2 = plt.subplots()
-    ax2.plot(user_week_df["date"], user_week_df["actual_hours"], marker="o", label="내 공부시간")
-    ax2.plot(class_avg_df["date"], class_avg_df["actual_hours"], marker="s", linestyle="--", label="우리반 평균")
-    ax2.set_title("이번 주 공부시간 비교")
-    ax2.set_xlabel("날짜")
-    ax2.set_ylabel("시간")
-    ax2.legend()
-    st.pyplot(fig2)
-else:
-    st.info("이번 주 공부기록이 아직 없습니다.")
