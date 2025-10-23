@@ -56,10 +56,13 @@ if not st.session_state.logged_in:
     """, unsafe_allow_html=True)
 
     st.markdown("<h3 style='text-align:left; color:#666;'>🔐 학생 로그인</h3>", unsafe_allow_html=True)
-    student_id = st.text_input("학번")
-    password = st.text_input("비밀번호", type="password")
+    
+    with st.form("login_form", clear_on_submit=False):
+        student_id = st.text_input("학번")
+        password = st.text_input("비밀번호", type="password")
+        submitted = st.form_submit_button("로그인")
 
-    if st.button("로그인"):
+    if submitted:
         if not student_id or not password:
             st.warning("학번과 비밀번호를 입력하세요.")
         else:
