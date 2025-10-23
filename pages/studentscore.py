@@ -4,10 +4,10 @@ import numpy as np
 import plotly.graph_objects as go
 
 # --- 세션 로그인 상태 확인 ---
-if "user_id" not in st.session_state:
-    st.warning("⚠️ 먼저 로그인해주세요.")
-    st.stop()
 
+if "logged_in" not in st.session_state or not st.session_state.logged_in: st.warning("⚠️ 로그인 후 이용할 수 있습니다. 메인 페이지로 이동해주세요.") st.stop()
+
+student_id = str(st.session_state.get("student_id", "")).strip() student_name = str(st.session_state.get("student_name", "")).strip()
 user_id = st.session_state["user_id"]
 user_name = st.session_state.get("user_name", "")
 user_role = st.session_state.get("role", "student")
