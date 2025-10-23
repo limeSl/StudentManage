@@ -1,96 +1,55 @@
 import streamlit as st
 import pandas as pd
-import gspread
-from google.oauth2.service_account import Credentials
 import plotly.graph_objects as go
 
-# 구글 시트 접근 설정
-SCOPE = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-CREDS = Credentials.from_service_account_info(st.secrets["gcp_service_account"], scopes=SCOPE)
+# Google Sheets CSV URL 변환
+sheet_url = "https://docs.google.com/spreadsheets/d/1Nap48AW6zmfwVqeTyVJ8oGcegt2j8VgD5ovBxxNKMgM/export?format=csv"
 
-# 구글 시트 불러오기
-SHEET_URL = st.secrets["private_gsheets_url"]
-
+# 데이터 불러오기
 @st.cache_data
 def load_data():
-    client = gspread.authorize(CREDS)
-    sheet = client.open_by_url(SHEET_URL).sheet1
-    data = sheet.get_all_values()
-    # 1행은 헤더, 2행부터 유효 데이터
-    df = pd.DataFrame(data[1:], columns=data[0])
+    df = pd.read_csv(sheet_url)
     return df
 
-st.title("📊 학생 성적 조회 시스템")
+st.title("📊 학생 성적 추이 시각화")
+st.write("이름을 선택하면 해당 학생의 성적 변화가 표시됩니다.")
 
 df = load_data()
 
-name = st.text_input("학생 이름을 입력하세요:")
+# 학생 이름 선택
+students = df['이름'].unique()
+selected_student = st.selectbox("학생 선택", students)
 
-if name:
-    # B열 기준으로 이름 검색
-    matches = df[df.iloc[:, 1] == name]
+# 선택한 학생 데이터 필터링
+student_data = df[df['이름'] == selected_student].sort_values(by='시험종류')
 
-    if not matches.empty:
-        st.success(f"✅ '{name}' 학생의 데이터를 찾았습니다.")
+# 그래프 그리기
+if not student_data.empty:
+    scores = student_data['성적'].values
+    exams = student_data['시험종류'].values
 
-        # 해당 학생 행 가져오기
-        row = matches.iloc[0]
+    # 상승/하강 색상 처리
+    colors = ['red' if j - i >= 0 else 'blue' for i, j in zip(scores[:-1], scores[1:])]
+    colors.insert(0, colors[0])  # 첫 데이터 색상 맞추기
 
-        # 시험종류(헤더)를 키로, 점수를 값으로 변환
-        score_dict = {df.columns[i]: row[i] for i in range(2, len(df.columns))}
-
-        # DataFrame으로 변환
-        score_df = pd.DataFrame(list(score_dict.items()), columns=["시험종류", "점수"])
-        score_df["점수"] = pd.to_numeric(score_df["점수"], errors="coerce")
-
-        # 증감율(%) 계산
-        score_df["변화(%)"] = score_df["점수"].pct_change() * 100
-        score_df["변화(%)"] = score_df["변화(%)"].fillna(0).round(1)
-
-        st.subheader("📘 세부 성적 변화표")
-        st.dataframe(score_df, hide_index=True)
-
-        # ======================
-        # Plotly 시각화
-        # ======================
-        st.subheader("📈 점수 변화 그래프")
-
-        fig = go.Figure()
-
-        # 막대그래프 (점수)
-        fig.add_trace(go.Bar(
-            x=score_df["시험종류"],
-            y=score_df["점수"],
-            name="점수",
-            marker_color="royalblue",
-            text=score_df["점수"],
-            textposition="outside"
-        ))
-
-        # 꺾은선그래프 (변화율)
-        fig.add_trace(go.Scatter(
-            x=score_df["시험종류"],
-            y=score_df["변화(%)"],
-            name="변화율(%)",
-            mode="lines+markers+text",
-            text=score_df["변화(%)"].astype(str) + "%",
-            textposition="top center",
-            line=dict(color="orange", width=3)
-        ))
-
-        fig.update_layout(
-            title=f"📊 {name} 학생의 시험별 점수 및 변화율",
-            xaxis_title="시험종류",
-            yaxis_title="점수",
-            yaxis=dict(showgrid=True),
-            legend=dict(orientation="h", x=0.3, y=-0.2),
-            height=500,
-            margin=dict(l=40, r=40, t=80, b=80)
+    fig = go.Figure(
+        data=go.Scatter(
+            x=exams,
+            y=scores,
+            mode='lines+markers',
+            line=dict(color='rgba(255,0,0,0.3)', width=3),
+            marker=dict(size=12, color=colors, line=dict(width=2, color='DarkSlateGrey'))
         )
+    )
 
-        st.plotly_chart(fig, use_container_width=True)
+    fig.update_layout(
+        title=f"{selected_student} 학생의 성적 변화",
+        xaxis_title="시험 종류",
+        yaxis_title="성적",
+        template="plotly_white",
+        hovermode="x unified"
+    )
 
-    else:
-        st.error(f"'{name}' 학생의 데이터를 찾을 수 없습니다.")
+    st.plotly_chart(fig, use_container_width=True)
 else:
-    st.info("이름을 입력하면 해당 학생의 성적을 불러옵니다.")
+    st.warning("선택한 학생의 데이터가 없습니다.")
