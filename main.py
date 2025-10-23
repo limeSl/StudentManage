@@ -1,7 +1,7 @@
 import streamlit as st
 import requests
 
-st.set_page_config(page_title="학생 메인/프로필", page_icon="👤", layout="centered")
+st.set_page_config(page_title="학생 메인/프로필", page_icon="🌸", layout="centered")
 
 API_URL = st.secrets["apps_script"]["url"]
 API_KEY = st.secrets["apps_script"]["api_key"]
@@ -16,13 +16,11 @@ def call_api(action: str, payload: dict):
     except requests.RequestException as e:
         return {"ok": False, "error": f"요청 실패: {e}"}
 
-    # Apps Script가 비어 있는 응답을 주면 JSON 파싱 오류 방지
     if not res.text.strip():
         return {"ok": False, "error": "서버에서 빈 응답을 받았습니다."}
     try:
         return res.json()
     except ValueError:
-        # JSON 아닌 경우, 원문 출력
         return {"ok": False, "error": f"JSON 파싱 실패: {res.text[:200]}"}
 
 def hide_sidebar_pages():
@@ -70,26 +68,63 @@ if not st.session_state.logged_in:
 else:
     # ---------- 프로필 페이지 ----------
     show_sidebar_pages()
-    st.title("👤 내 프로필")
+    st.title("🌼 내 프로필")
 
-    col1, col2 = st.columns([1,2])
-    with col1:
-        if st.session_state.profile_image:
-            st.image(st.session_state.profile_image, caption="프로필 이미지", use_column_width=True)
-        else:
-            st.info("프로필 이미지가 없습니다.")
-    with col2:
-        st.write(f"**학번:** {st.session_state.student_id}")
-        st.write(f"**이름:** {st.session_state.student_name}")
+    # --- CSS 커스터마이징 ---
+    st.markdown("""
+        <style>
+        .profile-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .profile-img {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            object-fit: cover;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        }
+        .profile-text {
+            font-size: 1.3rem;
+            font-weight: 600;
+            text-align: center;
+            color: var(--text-color, #222);
+        }
+        </style>
+    """, unsafe_allow_html=True)
 
-    st.divider()
-    st.subheader("프로필 이미지 URL 설정")
+    # --- 프로필 표시 ---
+    st.markdown('<div class="profile-container">', unsafe_allow_html=True)
+    if st.session_state.profile_image:
+        st.markdown(
+            f'<img src="{st.session_state.profile_image}" class="profile-img">',
+            unsafe_allow_html=True
+        )
+    else:
+        st.markdown(
+            '<div style="width:180px;height:180px;border-radius:50%;background:#eee;display:flex;align-items:center;justify-content:center;font-size:60px;color:#aaa;">🙂</div>',
+            unsafe_allow_html=True
+        )
+    st.markdown(
+        f'<div class="profile-text">{st.session_state.student_name}<br>{st.session_state.student_id}</div>',
+        unsafe_allow_html=True
+    )
+    st.markdown('</div>', unsafe_allow_html=True)
+
+    # --- 프로필 수정 섹션 ---
+    st.subheader("프로필 이미지 변경")
     new_img = st.text_input("이미지 URL 입력", value=st.session_state.profile_image, placeholder="https://...")
+
     if st.button("이미지 저장"):
         resp = call_api("updateProfile", {"studentId": st.session_state.student_id, "imageUrl": new_img})
         if resp.get("ok"):
-            st.session_state.profile_image = resp["data"].get("imageUrl") or ""
+            st.session_state.profile_image = new_img  # 바로 반영
             st.success("이미지 URL이 저장되었습니다.")
+            st.rerun()
         else:
             st.error(f"저장 실패: {resp.get('error')}")
 
