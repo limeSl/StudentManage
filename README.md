@@ -10,10 +10,12 @@ https://docs.google.com/spreadsheets/d/1Pa6sSB1dFiCge6MwnpgEG1AQnCHnVkVhdb1EGkUP
 이 코드를 활용하여 학생 확인을 생략하고 바로 검색해서 이용할 수 있습니다. (학번과 이름 사용)
 
 if "logged_in" not in st.session_state or not st.session_state.logged_in:
-    st.warning("⚠️ 로그인 후 이용할 수 있습니다.")
+    st.warning("⚠️ 로그인 후 이용할 수 있습니다. 메인 페이지로 이동해주세요.")
     st.stop()
-student_id = st.session_state.student_id
-student_name = st.session_state.student_name
+
+# 로그인 정보 가져오기
+student_id = str(st.session_state.get("student_id", "")).strip()
+student_name = str(st.session_state.get("student_name", "")).strip()
 
 
 https://docs.google.com/forms/d/e/1FAIpQLSfRFpDu9KDnGr-kiT_PlvEEWaO_UvQdDAvZaDzSDv4sT-yCFg/viewform
