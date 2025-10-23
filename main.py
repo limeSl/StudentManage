@@ -1,14 +1,13 @@
 import streamlit as st
 import requests
 
-st.set_page_config(page_title="학생 메인/프로필", page_icon="🌸", layout="centered")
+st.set_page_config(page_title="학생 메인/프로필", page_icon="🌼", layout="centered")
 
 API_URL = st.secrets["apps_script"]["url"]
 API_KEY = st.secrets["apps_script"]["api_key"]
 
 # ---------------- 공용 함수 ----------------
 def call_api(action: str, payload: dict):
-    """Apps Script Web API 호출 (POST, 예외처리 포함)"""
     data = {"action": action, "apiKey": API_KEY}
     data.update(payload or {})
     try:
@@ -68,9 +67,9 @@ if not st.session_state.logged_in:
 else:
     # ---------- 프로필 페이지 ----------
     show_sidebar_pages()
-    st.title("🌼 내 프로필")
+    st.title("🌷 내 프로필")
 
-    # --- CSS 커스터마이징 ---
+    # --- 스타일 설정 ---
     st.markdown("""
         <style>
         .profile-container {
@@ -78,21 +77,23 @@ else:
             align-items: center;
             justify-content: center;
             flex-direction: column;
-            gap: 10px;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
         .profile-img {
-            width: 180px;
-            height: 180px;
+            width: 240px;
+            height: 240px;
             border-radius: 50%;
             object-fit: cover;
-            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+            object-position: center;
+            box-shadow: 0 0 10px rgba(0,0,0,0.25);
         }
-        .profile-text {
-            font-size: 1.3rem;
-            font-weight: 600;
+        .profile-name {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #222;
+            margin-top: 15px;
+            line-height: 1.4;
             text-align: center;
-            color: var(--text-color, #222);
         }
         </style>
     """, unsafe_allow_html=True)
@@ -106,11 +107,11 @@ else:
         )
     else:
         st.markdown(
-            '<div style="width:180px;height:180px;border-radius:50%;background:#eee;display:flex;align-items:center;justify-content:center;font-size:60px;color:#aaa;">🙂</div>',
+            '<div style="width:240px;height:240px;border-radius:50%;background:#eee;display:flex;align-items:center;justify-content:center;font-size:80px;color:#bbb;">🙂</div>',
             unsafe_allow_html=True
         )
     st.markdown(
-        f'<div class="profile-text">{st.session_state.student_name}<br>{st.session_state.student_id}</div>',
+        f'<div class="profile-name">{st.session_state.student_name}<br>{st.session_state.student_id}</div>',
         unsafe_allow_html=True
     )
     st.markdown('</div>', unsafe_allow_html=True)
@@ -122,8 +123,8 @@ else:
     if st.button("이미지 저장"):
         resp = call_api("updateProfile", {"studentId": st.session_state.student_id, "imageUrl": new_img})
         if resp.get("ok"):
-            st.session_state.profile_image = new_img  # 바로 반영
-            st.success("이미지 URL이 저장되었습니다.")
+            st.session_state.profile_image = new_img  # 즉시 반영
+            st.success("프로필 이미지가 업데이트되었습니다.")
             st.rerun()
         else:
             st.error(f"저장 실패: {resp.get('error')}")
