@@ -86,11 +86,16 @@ else:
             flex-wrap: wrap;
         }
 
+        img {
+    	    width: 100%;
+    	    height: 100%;
+    	    object-fit: cover;
+        }
+
         .profile-img {
             width: 240px;
             height: 240px;
             border-radius: 10px;
-            object-fit: cover;
         }
 
         .profile-info {
