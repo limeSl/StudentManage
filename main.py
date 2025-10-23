@@ -79,7 +79,7 @@ else:
         .profile-wrapper {
             display: flex;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start;
             gap: 80px;
             margin-top: 60px;
             margin-bottom: 60px;
@@ -92,7 +92,7 @@ else:
             border-radius: 50%;
             object-fit: cover;
             object-position: center;
-            border: 5px solid #fff;
+            border: 3px solid #fff;
             box-shadow: 0 0 20px rgba(0,0,0,0.3);
         }
 
