@@ -49,7 +49,6 @@ st.markdown("""
 
 # ---------- 제목 ----------
 st.markdown('<div class="header-title">🎓 학생 피드백 조회</div>', unsafe_allow_html=True)
-st.markdown(f"<div class='header-sub'>{student_name} 학생의 과제 요약, 점수, 피드백입니다.</div>", unsafe_allow_html=True)
 
 # ---------- 구글 시트 불러오기 ----------
 sheet_csv_url = "https://docs.google.com/spreadsheets/d/1EUt6naZuxN1eJ0CIbUAphijpZU9r5pFJ-nKj4bA_l2Q/export?format=csv"
@@ -125,23 +124,41 @@ else:
         theme_base = st.get_option("theme.base")
     except Exception:
         theme_base = "light"
-    bar_color = "#7FDBFF" if theme_base == "dark" else "#1f77b4"
 
+    # 색상 설정 (밝기 테마별)
+    if theme_base == "dark":
+        colors = {
+            "내 점수": "#4DA3FF",   # 밝은 파란색
+            "평균 점수": "#6c9ecf", # 흐린 파랑
+            "중간 점수": "#6c9ecf"
+        }
+    else:
+        colors = {
+            "내 점수": "#1f77b4",   # 진한 파랑
+            "평균 점수": "#9ecae1", # 밝은 파랑
+            "중간 점수": "#9ecae1"
+        }
+
+    # 그래프용 데이터프레임
     score_df = pd.DataFrame({
         "항목": ["내 점수", "평균 점수", "중간 점수"],
-        "점수": [student_score, avg_score, median_score]
+        "점수": [student_score, avg_score, median_score],
+        "색상": ["내 점수", "평균 점수", "중간 점수"]
     })
 
+    # Altair 그래프
     bar = (
         alt.Chart(score_df)
         .mark_bar(size=35, cornerRadius=6)
         .encode(
-            x=alt.X('항목:N', sort=None, title=None),
+            x=alt.X('항목:N', sort=None, title=None, axis=alt.Axis(labelAngle=0)),  # 글씨 가로
             y=alt.Y('점수:Q', scale=alt.Scale(domain=[0, 100])),
-            color=alt.value(bar_color),
+            color=alt.Color('색상:N', scale=alt.Scale(domain=list(colors.keys()), range=list(colors.values())), legend=None),
             tooltip=['항목', alt.Tooltip('점수', format=".1f")]
         )
         .properties(width=620, height=320)
+        .configure_axis(labelFontSize=14, titleFontSize=14)
+        .configure_view(strokeWidth=0)
     )
 
     st.markdown("### 📊 점수 비교")
